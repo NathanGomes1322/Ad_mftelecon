@@ -5,10 +5,15 @@ $img = "$dir\wallpaper-pais.png"
 New-Item -ItemType Directory -Path $dir -Force | Out-Null
 Invoke-WebRequest 'https://raw.githubusercontent.com/NathanGomes1322/Ad_mftelecon/main/wallpaper.png' -OutFile $img -UseBasicParsing
 
-$k = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\PersonalizationCSP'
-New-Item -Path $k -Force | Out-Null
-New-ItemProperty -Path $k -Name DesktopImagePath   -Value $img -PropertyType String -Force | Out-Null
-New-ItemProperty -Path $k -Name DesktopImageUrl    -Value $img -PropertyType String -Force | Out-Null
-New-ItemProperty -Path $k -Name DesktopImageStatus -Value 1    -PropertyType DWord  -Force | Out-Null
+$base = [Microsoft.Win32.RegistryKey]::OpenBaseKey('LocalMachine','Registry64')
+$k = $base.CreateSubKey('SOFTWARE\Microsoft\Windows\CurrentVersion\PersonalizationCSP')
+$k.SetValue('DesktopImagePath',   $img, 'String')
+$k.SetValue('DesktopImageUrl',    $img, 'String')
+$k.SetValue('DesktopImageStatus', 1,    'DWord')
+$k.Close()
 
-Write-Output "OK - $env:COMPUTERNAME - reiniciar para aplicar"
+$lixo = $base.OpenSubKey('SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion',$true)
+if ($lixo) { $lixo.DeleteSubKeyTree('PersonalizationCSP',$false); $lixo.Close() }
+$base.Close()
+
+Write-Output "OK - $env:COMPUTERNAME - 64bit:$([Environment]::Is64BitProcess) - logoff para aplicar"
