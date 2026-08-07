@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 $dir = 'C:\Program Files\MFTelecom'
-$img = "$dir\wallpaper.png"
+$img = "$dir\wallpaper-pais.png"
 
 New-Item -ItemType Directory -Path $dir -Force | Out-Null
 Invoke-WebRequest 'https://raw.githubusercontent.com/NathanGomes1322/Ad_mftelecon/main/wallpaper.png' -OutFile $img -UseBasicParsing
